@@ -148,6 +148,9 @@ Spring Boot将所有的功能场景都抽取出来，做成一个个的starters�
 	)  
 @SpringBootConfiguration：SpringBoot配置类；  
 标注在某个类上，表示这是一个SpringBoot的配置类；  
-@Configuration：配置类上标注这个注解；  
+父配置：@Configuration：配置类上标注这个注解；  
 配置类====配置文件；配置类也是容器的一个组件；
+@EnableAutoConfiguration：开启自动配置功能；  
+父配置：@AutoConfigurationPackage：将主配置类（@SpringBootConfiguration注解标注的类）的所在包及所属子包里面的所有组件扫描到spring容器；
+
 
