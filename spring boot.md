@@ -153,4 +153,18 @@ Spring Boot将所有的功能场景都抽取出来，做成一个个的starters�
 @EnableAutoConfiguration：开启自动配置功能；  
 父配置：@AutoConfigurationPackage：将主配置类（@SpringBootConfiguration注解标注的类）的所在包及所属子包里面的所有组件扫描到spring容器；
 
-
+##5、使用Spring Initializer快速创建Spring Boot项目  
+IDE都支持使用Spring的项目创建向导快速创建一个Spring Boot项目；  
+向导会联网创建Spring Boot项目；  
+默认生成的Spring Boot项目的特点：  
+（1）主程序已经自动生成好了，只需要完成自己的逻辑开发；  
+（2）resources文件夹中目录结构：  
+①static：保存所有的静态资源：js css images；  
+②templates：保存所有的模板页面：（spring boot默认jar包使用嵌入式的tomcat，默认不支持jsp页面）；可以使用模板引擎（freemarker、thymeleaf）；  
+③application.properties:spring boot应用的配置文件；
+#二、配置文件
+####1、配置文件  
+SpringBoot使用一个全局的配置文件，配置文件名是固定的；  
+①application.properties;  
+②application.yml。  
+配置文件的作用：修改springboot自动配置的默认值；
