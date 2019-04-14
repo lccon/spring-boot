@@ -317,4 +317,5 @@ File -> Settings -> Editor -> File Encodings
 	${random.int(10)} ${random.int[1024, 65536]} ${random.uuid}  
 ②没有默认值可以自定义（person.data没有值，那就用李代替）  
 
-	person.dog.name=${person.data:李}_雪碧
+	person.dog.name=${person.data:李}_雪碧  
+
