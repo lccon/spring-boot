@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
- * Description:
+ * Description: 方法输出文本"hello Spring Boot"
  *
  * @Date:2019/4/13
  * @Author:lc

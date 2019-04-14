@@ -167,4 +167,154 @@ IDE都支持使用Spring的项目创建向导快速创建一个Spring Boot项目
 SpringBoot使用一个全局的配置文件，配置文件名是固定的；  
 ①application.properties;  
 ②application.yml。  
-配置文件的作用：修改springboot自动配置的默认值；
+配置文件的作用：修改springboot自动配置的默认值；  
+####2、获取application.properties属性  
+通过@ConfigurationProperties(prefix="person")对象注解，获取以person为前缀的属性值放入当前对象的属性中。
+####3、解决获取application.properties乱码问题  
+①在配置文件中加入配置  
+
+	server.tomcat.uri-encoding=UTF-8
+	spring.http.encoding.charset=UTF-8
+	spring.http.encoding.enabled=true
+	spring.http.encoding.force=true
+	spring.messages.encoding=UTF-8
+②还是乱码，修改idea配置  
+设置 File Encodings的Transparent native-to-ascii conversion为true，  
+具体步骤如下：依次点击
+File -> Settings -> Editor -> File Encodings
+将Properties Files (*.properties)下的Default encoding for properties files设置为UTF-8，将Transparent native-to-ascii conversion前的勾选上。  
+####4、比较使用@ConfigurationProperties(prefix="person")和使用@Value()获取属性的区别  
+@ConfigurationProperties:支持松散绑定（userName或user-name),@Value不支持；  
+@ConfigurationProperties：不支持SpEL(#{1+2}),@Value支持；  
+@ConfigurationProperties：支持JSR303数据校验，@Value不支持；
+@ConfigurationProperties：支持复杂类型封装（Map,List),@Value不支持；  
+如果说，我们只是在某个业务逻辑中需要获取一下配置文件中的某项值，使用@Value；  
+如果说，我们专门编写了一个javaBean来和配置文件进行配置，我们就直接使用@ConfigurationProperties;
+####5、@PropertySource("classpath:person.properties")，通过对象注解获取指定配置文件属性值；
+####6、@ImportResource(locations = {"classpath:boot.xml"})，导入spring的配置文件，让配置文件里边的内容生效，标注在主配置类上；  
+####7、文件  
+①对象：  
+
+	@Component
+	@PropertySource("classpath:person.properties")
+	//@ConfigurationProperties(prefix="person")
+	//@Validated
+	public class Person {
+	    //@Email
+	    //@Value("${person.name}")
+	    private String name;
+	    //@Value("#{12+5}")
+	    private Integer age;
+	    //@Value("true")
+	    private Boolean boss;
+	    //@Value("2019/4/14")
+	    private Date birthday;
+	    private Map<String, Object> maps;
+	    private List<Object> list;
+	    private Dog dog;
+	
+	    public String getName() {
+	        return name;
+	    }
+	
+	    public void setName(String name) {
+	        this.name = name;
+	    }
+	
+	    public Integer getAge() {
+	        return age;
+	    }
+	
+	    public void setAge(Integer age) {
+	        this.age = age;
+	    }
+	
+	    public Boolean getBoss() {
+	        return boss;
+	    }
+	
+	    public void setBoss(Boolean boss) {
+	        this.boss = boss;
+	    }
+	
+	    public Date getBirthday() {
+	        return birthday;
+	    }
+	
+	    public void setBirthday(Date birthday) {
+	        this.birthday = birthday;
+	    }
+	
+	    public Map<String, Object> getMaps() {
+	        return maps;
+	    }
+	
+	    public void setMaps(Map<String, Object> maps) {
+	        this.maps = maps;
+	    }
+	
+	    public List<Object> getList() {
+	        return list;
+	    }
+	
+	    public void setList(List<Object> list) {
+	        this.list = list;
+	    }
+	
+	    public Dog getDog() {
+	        return dog;
+	    }
+	
+	    public void setDog(Dog dog) {
+	        this.dog = dog;
+	    }
+	
+	    @Override
+	    public String toString() {
+	        return "Person{" +
+	                "name='" + name + '\'' +
+	                ", age=" + age +
+	                ", boss=" + boss +
+	                ", birthday=" + birthday +
+	                ", maps=" + maps +
+	                ", list=" + list +
+	                ", dog=" + dog +
+	                '}';
+	    }
+	}  
+主配置类：  
+
+	@SpringBootApplication
+	@ImportResource(locations = {"classpath:boot.xml"})
+	public class SpringBoot02Application {
+	
+		public static void main(String[] args) {
+			SpringApplication.run(SpringBoot02Application.class, args);
+		}
+	
+	}  
+####8、使用第二种方式替换@ImportResource(locations = {"classpath:boot.xml"})生成spring的xml配置文件；  
+	/**
+	 * Description:指明当前类是一个配置类；就是替代spring的xml配置文件
+	 *
+	 * @Date:2019/4/14
+	 * @Author:lc
+	 */
+	@Configuration
+	public class SpringBootConfig {
+	
+	    // 将方法的返回值添加到容器中；容器中这个组件默认的id就是方法名
+	    @Bean
+	    public BootService bootService() {
+	        return new BootService();
+	    }
+	
+	}
+####9、配置文件占位符  
+①随机数  
+
+	${random.value} ${random.int} ${random.long}   
+	${random.int(10)} ${random.int[1024, 65536]} ${random.uuid}  
+②没有默认值可以自定义（person.data没有值，那就用李代替）  
+
+	person.dog.name=${person.data:李}_雪碧

@@ -22,6 +22,7 @@
         </dependency>
     </dependencies>
 
+    <!--插件作用：可以将应用打包成一个可执行的jar包-->
     <build>
         <plugins>
             <plugin>
