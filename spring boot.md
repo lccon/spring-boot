@@ -318,4 +318,5 @@ File -> Settings -> Editor -> File Encodings
 ②没有默认值可以自定义（person.data没有值，那就用李代替）  
 
 	person.dog.name=${person.data:李}_雪碧  
-
+####10、spring.profiles.active=dev，用来激活启动版本，使用dev版本启动spring boot
+####11、server.servlet.context-path=/boot，URL添加固定配置，访问如：http://localhost:8022/boot/api/study
