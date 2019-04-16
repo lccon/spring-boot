@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.lc.SpringBoot02ApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.07 s - in com.lc.SpringBoot02ApplicationTests
