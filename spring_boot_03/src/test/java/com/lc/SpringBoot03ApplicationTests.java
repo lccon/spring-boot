@@ -17,11 +17,11 @@ public class SpringBoot03ApplicationTests {
     @Test
     public void contextLoads() {
 
-       /* logger.trace("1");
+        logger.trace("1");
         logger.debug("2");
         logger.info("3");
         logger.warn("4");
-        logger.error("5");*/
+        logger.error("5");
 
     }
 
