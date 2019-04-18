@@ -1,0 +1,11 @@
+2019-04-17 20:46:48.754  INFO 13364 --- [main] com.lc.SpringBoot03ApplicationTests      : Starting SpringBoot03ApplicationTests on LAPTOP-FE8BED46 with PID 13364 (started by n-335 in D:\SpringBoot\spring_boot_03)
+2019-04-17 20:46:48.756 DEBUG 13364 --- [main] com.lc.SpringBoot03ApplicationTests      : Running with Spring Boot v2.1.4.RELEASE, Spring v5.1.6.RELEASE
+2019-04-17 20:46:48.757  INFO 13364 --- [main] com.lc.SpringBoot03ApplicationTests      : No active profile set, falling back to default profiles: default
+2019-04-17 20:46:54.157  INFO 13364 --- [main] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+2019-04-17 20:46:55.228  INFO 13364 --- [main] com.lc.SpringBoot03ApplicationTests      : Started SpringBoot03ApplicationTests in 7.519 seconds (JVM running for 9.807)
+2019-04-17 20:46:55.662 TRACE 13364 --- [main] com.lc.SpringBoot03ApplicationTests      : 1
+2019-04-17 20:46:55.663 DEBUG 13364 --- [main] com.lc.SpringBoot03ApplicationTests      : 2
+2019-04-17 20:46:55.663  INFO 13364 --- [main] com.lc.SpringBoot03ApplicationTests      : 3
+2019-04-17 20:46:55.664  WARN 13364 --- [main] com.lc.SpringBoot03ApplicationTests      : 4
+2019-04-17 20:46:55.664 ERROR 13364 --- [main] com.lc.SpringBoot03ApplicationTests      : 5
+2019-04-17 20:46:55.679  INFO 13364 --- [Thread-2] o.s.s.concurrent.ThreadPoolTaskExecutor  : Shutting down ExecutorService 'applicationTaskExecutor'

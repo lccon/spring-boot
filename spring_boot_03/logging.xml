@@ -1,0 +1,11 @@
+2019-04-17 20:44:40.491  INFO 16300 --- [main] com.lc.SpringBoot03ApplicationTests      : Starting SpringBoot03ApplicationTests on LAPTOP-FE8BED46 with PID 16300 (started by n-335 in D:\SpringBoot\spring_boot_03)
+2019-04-17 20:44:40.493 DEBUG 16300 --- [main] com.lc.SpringBoot03ApplicationTests      : Running with Spring Boot v2.1.4.RELEASE, Spring v5.1.6.RELEASE
+2019-04-17 20:44:40.496  INFO 16300 --- [main] com.lc.SpringBoot03ApplicationTests      : No active profile set, falling back to default profiles: default
+2019-04-17 20:44:45.859  INFO 16300 --- [main] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+2019-04-17 20:44:47.509  INFO 16300 --- [main] com.lc.SpringBoot03ApplicationTests      : Started SpringBoot03ApplicationTests in 7.991 seconds (JVM running for 10.668)
+2019-04-17 20:44:47.861 TRACE 16300 --- [main] com.lc.SpringBoot03ApplicationTests      : 1
+2019-04-17 20:44:47.861 DEBUG 16300 --- [main] com.lc.SpringBoot03ApplicationTests      : 2
+2019-04-17 20:44:47.861  INFO 16300 --- [main] com.lc.SpringBoot03ApplicationTests      : 3
+2019-04-17 20:44:47.861  WARN 16300 --- [main] com.lc.SpringBoot03ApplicationTests      : 4
+2019-04-17 20:44:47.862 ERROR 16300 --- [main] com.lc.SpringBoot03ApplicationTests      : 5
+2019-04-17 20:44:47.872  INFO 16300 --- [Thread-2] o.s.s.concurrent.ThreadPoolTaskExecutor  : Shutting down ExecutorService 'applicationTaskExecutor'
