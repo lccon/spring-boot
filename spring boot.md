@@ -320,4 +320,37 @@ File -> Settings -> Editor -> File Encodings
 	person.dog.name=${person.data:李}_雪碧  
 ####10、spring.profiles.active=dev，用来激活启动版本，使用dev版本启动spring boot  
 
-####11、server.servlet.context-path=/boot，URL添加固定配置，访问如：http://localhost:8022/boot/api/study
+####11、server.servlet.context-path=/boot，URL添加固定配置，访问如：http://localhost:8022/boot/api/study  
+####12、debug=true, 查看所有的可用配置文件和不可用配置文件
+#三、日志  
+springboot的日志为log4j2(作用于接口）+logback（作用于实现类）。  
+日志级别，由低到高trace<debug<info<warn<error。  
+
+application.properties配置文件中设置：  
+① logging.level.com.lc = trace;自定义设置日志级别，默认为info；  
+② logging.file=logging.xml;将日志打印在项目根目录下，生成logging.xml文件中；  
+③ logging.path=/spring/logging;将日志打印在项目盘符下/spring/logging路径下生成logger.log中；  
+#四、WEB开发  
+####1、静态文件存放路径：  
+①classpath：/resources;  
+②classpath：/static;  
+③classpath：/public;  
+自动从三个资源文件中寻找css、js等配置文件资源。  
+####2、HTML存放路径：  
+classpath：/templates，必须引入spring-boot-starter-thymeleaf的jar包，默认查找index.html
+####3、使用jsp文件：  
+创建存放jsp的路径WEB-INF/jsp,需要创建WEB-INF/web.xml,  
+需要引入spring-boot-starter-tomcat和tomcat-jasper的jar包，  
+application.properties需要配置前后缀：spring.mvc.view.prefix=/WEB-INF/jsp/和spring.mvc.view.suffix=.jsp
+####4、拦截控制转发请求对应资源：
+	@Configuration
+	public class MyMvcConfig implements WebMvcConfigurer{
+
+	    public void addViewControllers(ViewControllerRegistry registry) {
+	        registry.addViewController("/").setViewName("login");
+	        registry.addViewController("/index.html").setViewName("login");
+	        registry.addViewController("/login.html").setViewName("login");
+	    }
+
+	}
+
