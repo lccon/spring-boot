@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="spring_boot_05_conn_sql:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="spring_boot_05_conn_sql-0.0.1-SNAPSHOT.war">
+      <element id="artifact" artifact-name="spring_boot_05_conn_sql:war exploded" />
+    </root>
+  </artifact>
+</component>
