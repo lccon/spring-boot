@@ -12,6 +12,7 @@ import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.quartz.CronTriggerFactoryBean;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
@@ -40,7 +41,7 @@ public class QuartzConfig {
      * @return
      * @throws IOException
      */
-    @Bean
+    @Bean("schedulerFactoryBean")
     public SchedulerFactoryBean schedulerFactoryBean() throws IOException {
         //从quartz.properties文件中读取Quartz配置属性
         PropertiesFactoryBean propertiesFactoryBean = new PropertiesFactoryBean();
@@ -60,14 +61,6 @@ public class QuartzConfig {
         factory.setAutoStartup(true);
 
         return factory;
-    }
-
-    /*
-     * 通过SchedulerFactoryBean获取Scheduler的实例
-     */
-    @Bean(name="scheduler")
-    public Scheduler scheduler() throws IOException {
-        return schedulerFactoryBean().getScheduler();
     }
 
 }
