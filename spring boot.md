@@ -446,14 +446,23 @@ application.properties配置文件中设置：
   需要引入spring-boot-starter-tomcat和tomcat-jasper的jar包，  
   application.properties需要配置前后缀：spring.mvc.view.prefix=/WEB-INF/jsp/和spring.mvc.view.suffix=.jsp
 
-#### 4、拦截控制转发请求对应资源
+#### 4、pom.xml依赖jar包
+
+#### 9、拦截控制转发请求对应资源
 
 	@Configuration
 	public class MyMvcConfig implements WebMvcConfigurer{
+		// 转发强求到到指定页面中
 	    public void addViewControllers(ViewControllerRegistry registry) {
 	        registry.addViewController("/").setViewName("login");
 	        registry.addViewController("/index.html").setViewName("login");
 	        registry.addViewController("/login.html").setViewName("login");
+	    }
+	    
+	    // 使自己定义的拦截器生效
+	    public void addInterceptors(InterceptorRegistry registry) {
+	        registry.addInterceptor(new MyLoginHandlerInterceptor()).addPathPatterns("/**")
+	            .excludePathPatterns("/index.html", "/", "/user/login");
 	    }
 	
 	}
