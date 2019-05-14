@@ -447,7 +447,206 @@ application.properties配置文件中设置：
   application.properties需要配置前后缀：spring.mvc.view.prefix=/WEB-INF/jsp/和spring.mvc.view.suffix=.jsp
 
 #### 4、pom.xml依赖jar包
+	    <!-- 依赖父项目，版本控制 --> 
+	    <parent>
+	        <groupId>org.springframework.boot</groupId>
+	        <artifactId>spring-boot-starter-parent</artifactId>
+	        <version>1.5.13.RELEASE</version>
+	        <relativePath/> <!-- lookup parent from repository -->
+	    </parent>
+	
+	    <!-- 自定义配置版本 -->
+	    <properties>
+	        <java.version>1.8</java.version>
+	    </properties>
+	
+	    <dependencies>
+		<!-- web项目开发，使用自定义日志文件 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		
+	    <!-- 测试jar -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
+	    <!-- log4j2日志 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-log4j2</artifactId>
+		</dependency>
+	
+		<!-- 使用thymeleaf模板引擎 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+	
+		<!-- 连接mybatis -->
+		<dependency>
+			<groupId>org.mybatis.spring.boot</groupId>
+			<artifactId>mybatis-spring-boot-starter</artifactId>
+			<version>1.3.2</version>
+		</dependency>
+	
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+		</dependency>
+	
+		<!-- 使用alibaba数据源druid -->
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>druid-spring-boot-starter</artifactId>
+			<version>1.1.9</version>
+		</dependency>
+	</dependencies>
+	
+	<!-- 定义一个可执行jar文件 -->
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+#### 5、application.properties配置文件  
+	spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+	spring.datasource.url=jdbc:mysql://127.0.0.1:3306/springboot?characterEncoding=utf8
+	spring.datasource.username=root
+	spring.datasource.password=root
+	spring.datasource.type=com.alibaba.druid.pool.DruidDataSource
+	#初始连接数
+	spring.datasource.druid.initial-size=5
+	#最大连接数
+	spring.datasource.druid.max-active=20
+	#最小空闲
+	spring.datasource.druid.min-idle=5
+	#最大等待时间
+	spring.datasource.druid.max-wait=6000
+	#每60秒运行一次空闲连接回收器
+	spring.datasource.druid.time-between-eviction-runs-millis=60000
+	#池中的连接空闲5分钟后被回收
+	spring.datasource.druid.min-evictable-idle-time-millis=300000
+	#验证使用的SQL语句
+	spring.datasource.druid.validation-query=SELECT 1 FROM DUAL
+	#指明连接是否被空闲连接回收器(如果有)进行检验.如果检测失败,则连接将被从池中去除.
+	spring.datasource.druid.test-while-idle=true
+	#借出连接时不要测试，否则很影响性能
+	spring.datasource.druid.test-on-borrow=false
+	#生产环境归还连接时不要测试
+	spring.datasource.druid.test-on-return=false
+	#是否自动回收超时连接
+	spring.datasource.druid.remove-abandoned=true
+	#超时时间(以秒数为单位)
+	spring.datasource.druid.remove-abandoned-timeout=10
+	#是否在自动回收超时连接的时候打印连接的超时错误
+	spring.datasource.druid.log-abandoned=true
+	# 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
+	spring.datasource.druid.filters=stat,wall,log4j
+	# 是否缓存preparedStatement，也就是PSCache  官方建议MySQL下建议关闭   个人建议如果想用SQL防火墙 建议打开
+	spring.datasource.druid.pool-prepared-statements=true
+	# 最大的连接池就绪等待连接数量
+	spring.datasource.druid.max-pool-prepared-statement-per-connection-size=20
+	
+	#mybatis配置文件路径
+	mybatis.config-location=classpath:mybatis/mybatis-config.xml
+	#mybatis映射文件xml存放路径
+	mybatis.mapper-locations=classpath:mybatis/mapper/*.xml
+#### 6、mybatis-config.xml配置文件
+	<?xml version="1.0" encoding="UTF-8" ?>
+	<!DOCTYPE configuration
+	        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+	        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+	<configuration>
+	    <settings>
+			<!--设置驼峰-->
+	        <setting name="mapUnderscoreToCamelCase" value="true"/>
+	    </settings>
+	</configuration>
+mybatis自定配置生效文件MyMybatisConfig.java  
 
+	@Configuration
+	public class MyMybatisConfig {
+	    @Bean
+	    public ConfigurationCustomizer configurationCustomizer() {
+	        return new ConfigurationCustomizer() {
+	            @Override
+	            public void customize(org.apache.ibatis.session.Configuration configuration) {
+	                configuration.setMapUnderscoreToCamelCase(true);
+	            }
+	        };
+	    }
+	}
+#### 7、druid数据源配置文件MyDruidConfig.java  
+	@Configuration
+	public class MyDruidConfig {
+	
+	    @ConfigurationProperties(prefix = "spring.datasource")
+	    @Bean
+	    public DataSource druid() {
+	        return new DruidDataSource();
+	    }
+	
+		// 使用servlet功能
+	    @Bean
+	    public ServletRegistrationBean statViewServlet() {
+	        ServletRegistrationBean bean = new ServletRegistrationBean(new StatViewServlet(), "/druid/*");
+	        Map<String, String> map = new HashMap<String, String>();
+	        map.put("loginUsername", "admin");
+	        map.put("loginPassword", "123");
+	        bean.setInitParameters(map);
+	        return bean;
+	    }
+	
+		// 使用过滤器功能
+	    @Bean
+	    public FilterRegistrationBean filterRegistrationBean() {
+	        FilterRegistrationBean bean = new FilterRegistrationBean();
+	        bean.setFilter(new WebStatFilter());
+	        Map<String, String> map = new HashMap<>();
+	        map.put("exclusions", "*.js, *.css, /druid/*");
+	        bean.setInitParameters(map);
+	        bean.setUrlPatterns(Arrays.asList("/*"));
+	        return bean;
+	    }
+	
+	}
+#### 8、自定义登录拦截器MyLoginHandlerInterceptor.java  
+	public class MyLoginHandlerInterceptor implements HandlerInterceptor {
+	
+	    @Override
+	    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object o) throws Exception {
+	        String loginUsername = (String)request.getSession().getAttribute("loginUser");
+	        if(!StringUtils.isEmpty(loginUsername)) {
+	            return true;
+	        }
+	        request.setAttribute("msg", "没有权限请先登录");
+	        request.getRequestDispatcher("/index.html").forward(request, response);
+	        return false;
+	    }
+	
+	    @Override
+	    public void postHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, ModelAndView modelAndView) throws Exception {
+	
+	    }
+	
+	    @Override
+	    public void afterCompletion(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e) throws Exception {
+	
+	    }
+	}
 #### 9、拦截控制转发请求对应资源
 
 	@Configuration
