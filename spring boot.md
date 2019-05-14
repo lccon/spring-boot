@@ -32,36 +32,20 @@
 
 ```
 java
-	<profiles> 
-		<profile> 
-			<id>jdk1.8</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<properties>
-				<maven.compiler.source>1.8</maven.compiler.source>
-				<maven.compiler.target>1.8</maven.compiler.target>
-				<maven.compiler.compilerVersion>1.8</maven.compiler.compilerVersion>
-			</properties>
-		</profile>
-	</profiles>  
+<profiles> 
+	<profile> 
+		<id>jdk1.8</id>
+		<activation>
+			<activeByDefault>true</activeByDefault>
+		</activation>
+		<properties>
+			<maven.compiler.source>1.8</maven.compiler.source>
+			<maven.compiler.target>1.8</maven.compiler.target>
+			<maven.compiler.compilerVersion>1.8</maven.compiler.compilerVersion>
+		</properties>
+	</profile>
+</profiles>  
 ```
-
-
-
-​	<profiles> 
-​		<profile> 
-​			<id>jdk1.8</id>
-​			<activation>
-​				<activeByDefault>true</activeByDefault>
-​			</activation>
-​			<properties>
-​				<maven.compiler.source>1.8</maven.compiler.source>
-​				<maven.compiler.target>1.8</maven.compiler.target>
-​				<maven.compiler.compilerVersion>1.8</maven.compiler.compilerVersion>
-​			</properties>
-​		</profile>
-​	</profiles>  
 
 ## 3、Spring Boot项目HelloWorld  
 
