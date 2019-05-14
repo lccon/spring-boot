@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lc.mapper.PropertyDictMapper">
+    <resultMap id="propertyDictResultMap" type="com.lc.domain.PropertyDict">
+        <result property="id" column="id"/>
+        <result property="propertyDomain.id" column="property_domain_id"/>
+        <result property="displayName" column="display_name"/>
+    </resultMap>
+
+    <sql id="columns">
+        id, property_domain_id, display_name
+    </sql>
+
+    <select id="getPropertyDictById" parameterType="java.lang.Long" resultMap="propertyDictResultMap">
+        SELECT
+        <include refid="columns"/>
+        FROM system_property_dict
+        WHERE id = #{id}
+    </select>
+</mapper>
