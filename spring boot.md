@@ -1,6 +1,6 @@
 # 一、String Boot入门  
 
-## 1、Spring Boot简介  
+#### 1、Spring Boot简介  
 
 1、简化Spring应用开发的一个框架；
 
@@ -8,7 +8,7 @@
 
 3、J2EE开发的一站式解决方案；
 
-## 2、微服务  
+#### 2、微服务  
 
 微服务：架构风格（服务微化）
 
@@ -47,7 +47,7 @@ java
 </profiles>  
 ```
 
-## 3、Spring Boot项目HelloWorld  
+#### 3、Spring Boot项目HelloWorld  
 
 功能：浏览器发送hello请求，服务器接收请求处理，响应hello world字符串；
 
@@ -130,7 +130,7 @@ java
 
 导入插件，在当前目录下直接使用java -jar spring_boot_01-1.0-SNAPSHOT.jar命令，运行程序；
 
-## 4、Hello World探究
+#### 4、Hello World探究
 
 1、POM文件：父项目
 
