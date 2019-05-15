@@ -567,7 +567,7 @@ mybatis自定配置生效文件MyMybatisConfig.java
 	    public ConfigurationCustomizer configurationCustomizer() {
 	        return new ConfigurationCustomizer() {
 	            @Override
-	            public void customize(org.apache.ibatis.session.Configuration configuration) {
+	            public void customize(org.apache.ibatis.session.Configuration configuration) 			 {
 	                configuration.setMapUnderscoreToCamelCase(true);
 	            }
 	        };
@@ -649,4 +649,275 @@ mybatis自定配置生效文件MyMybatisConfig.java
 	    }
 	
 	}
+
+## 五、与定时任务Quartz和定时器Core结合使用 
+
+#### 1、pom.xml引入Quartz依赖 
+
+```java
+		<dependency>
+			<groupId>org.quartz-scheduler</groupId>
+			<artifactId>quartz</artifactId>
+			<version>2.3.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.quartz-scheduler</groupId>
+			<artifactId>quartz-jobs</artifactId>
+			<version>2.3.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+			<version>4.3.13.RELEASE</version>
+		</dependency>
+```
+
+#### 2、添加quartz.properties配置文件 
+
+```java
+org.quartz.scheduler.instanceName = cloudScheduler 
+org.quartz.scheduler.instanceId = AUTO  
+
+org.quartz.threadPool.class = org.quartz.simpl.SimpleThreadPool 
+org.quartz.threadPool.threadCount = 10 
+org.quartz.threadPool.threadPriority = 5 
+org.quartz.threadPool.threadsInheritContextClassLoaderOfInitializingThread = true 
+
+org.quartz.jobStore.misfireThreshold = 60000
+
+
+#org.quartz.jobStore.class属性为 JobStoreTX，将任务持久化到数据中。   
+#集群中节点依赖于数据库来传播 Scheduler 实例的状态，你只能在使用 JDBC JobStore 时应用 Quartz 集群。   
+org.quartz.jobStore.class = org.quartz.impl.jdbcjobstore.JobStoreTX 
+org.quartz.jobStore.driverDelegateClass=org.quartz.impl.jdbcjobstore.StdJDBCDelegate 
+org.quartz.jobStore.tablePrefix = QRTZ_
+org.quartz.jobStore.maxMisfiresToHandleAtATime=10 
+#org.quartz.jobStore.isClustered 属性为 true，实例要它参与到一个集群当中。   
+org.quartz.jobStore.isClustered = false  
+org.quartz.jobStore.clusterCheckinInterval = 3600000
+```
+
+#### 3、生成quartz表
+
+```
+QRTZ_JOB_DETAILS，
+QRTZ_TRIGGERS，
+QRTZ_SIMPLE_TRIGGERS，
+QRTZ_CRON_TRIGGERS，
+QRTZ_SIMPROP_TRIGGERS，
+QRTZ_BLOB_TRIGGERS，
+QRTZ_CALENDARS，
+QRTZ_PAUSED_TRIGGER_GRPS，
+QRTZ_FIRED_TRIGGERS，
+QRTZ_SCHEDULER_STATE，
+QRTZ_LOCKS
+```
+
+#### 4、配置jobFactory，使用@Autowired注解注入 
+
+```java
+@Component("jobFactory")
+public class AutoWiredSpringBeanToJobFactory extends SpringBeanJobFactory implements ApplicationContextAware {
+    private transient AutowireCapableBeanFactory beanFactory;
+
+    @Override
+    public void setApplicationContext(final ApplicationContext context) {
+        beanFactory = context.getAutowireCapableBeanFactory();
+    }
+
+    @Override
+    protected Object createJobInstance(final TriggerFiredBundle bundle) throws Exception 	 {
+        final Object job = super.createJobInstance(bundle);
+        beanFactory.autowireBean(job);
+        return job;
+    }
+}
+```
+
+#### 5、引入quartz.properties文件，配置数据源
+
+```java
+@Configuration
+public class QuartzConfig {
+    // 配置文件路径
+    private static final String QUARTZ_CONFIG = "/quartz.properties";
+
+    // 查询系统中配置好的数据源添加到配置
+    @Autowired
+    @Qualifier(value = "dataSource")
+    private DataSource dataSource;
+    @Autowired
+    private JobFactory jobFactory;
+
+    /**
+     * @return
+     * @throws IOException
+     */
+    @Bean("schedulerFactoryBean")
+    public SchedulerFactoryBean schedulerFactoryBean() throws IOException {
+        //从quartz.properties文件中读取Quartz配置属性
+        PropertiesFactoryBean propertiesFactoryBean = new PropertiesFactoryBean();
+        propertiesFactoryBean.setLocation(new ClassPathResource(QUARTZ_CONFIG));
+        //在quartz.properties中的属性被读取并注入后再初始化对象
+        propertiesFactoryBean.afterPropertiesSet();
+
+        //创建SchedulerFactoryBean
+        SchedulerFactoryBean factory = new SchedulerFactoryBean();
+        factory.setQuartzProperties(propertiesFactoryBean.getObject());
+        // 使用应用的dataSource替换quartz的dataSource
+        factory.setDataSource(dataSource);
+        factory.setJobFactory(jobFactory);
+
+        factory.setOverwriteExistingJobs(true);
+        // 设置自行启动
+        factory.setAutoStartup(true);
+
+        return factory;
+    }
+
+}
+```
+
+#### 6、得到spring管理的类名称工具SpringUtil.java
+
+```java
+@Component
+public class SpringUtil implements ApplicationContextAware {
+   /**
+    * 上下文对象实例
+    */
+   public static ApplicationContext applicationContext;
+
+   @Override
+   public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+      if(applicationContext!=null&&this.applicationContext==null){
+         this.applicationContext = applicationContext;
+      }
+   }
+
+   /**
+    * 获取applicationContext
+    * 
+    * @return
+    */
+   public static ApplicationContext getApplicationContext() {
+      return applicationContext;
+   }
+
+   /**
+    * 通过name获取 Bean.
+    * 
+    * @param name
+    * @return
+    */
+   public static Object getBean(String name) {
+      return getApplicationContext().getBean(name);
+   }
+
+   /**
+    * 通过class获取Bean.
+    * 
+    * @param clazz
+    * @param <T>
+    * @return
+    */
+   public static <T> T getBean(Class<T> clazz) {
+      return getApplicationContext().getBean(clazz);
+   }
+
+   /**
+    * 通过name,以及Clazz返回指定的Bean
+    * 
+    * @param name
+    * @param clazz
+    * @param <T>
+    * @return
+    */
+   public static <T> T getBean(String name, Class<T> clazz) {
+      return getApplicationContext().getBean(name, clazz);
+   }
+}
+```
+
+#### 7、生成定时任务JobUtil.java
+
+```java
+public class JobUtil {
+
+    public static final Logger logger = LoggerFactory.getLogger(JobUtil.class);
+
+    private static JobUtil jobUtil = new JobUtil();
+
+    public static Scheduler scheduler = null;
+
+    private JobUtil() {
+        logger.info("SchedulerMain is created");
+    }
+
+    // 使用单例代替spring管理注入
+    public static JobUtil getInstance() {
+        if (scheduler == null){
+            synchronized (JobUtil.class){
+                if (scheduler == null){
+                    scheduler = SpringUtil.getBean(Scheduler.class);
+                }
+            }
+        }
+        return jobUtil;
+    }
+
+    public void addSchedulerJob(String quartzName,String quartzGroup, 
+                                String cronExpression) throws Exception {
+
+        JobDetail jobDetail = JobBuilder.newJob(EmployerJob.class)
+            .withIdentity(quartzName, quartzGroup)
+            .storeDurably(false).build();
+
+        Trigger trigger = TriggerBuilder.newTrigger().forJob(jobDetail)
+            .withIdentity(quartzName, quartzGroup)
+            .withSchedule(CronScheduleBuilder.cronSchedule(cronExpression)).build();
+
+        scheduler.scheduleJob(jobDetail, trigger);
+        scheduler.start();
+    }
+
+    // 调用任务用到反射，实体类必须序列化
+    public void addSchedulerTask(Task task, TaskPloy taskPloy) throws Exception{
+
+        String name = task.getName();
+        String group = task.getTaskGroup();
+
+        // 先停止删除定时任务
+        scheduler.unscheduleJob(TriggerKey.triggerKey(name, group));
+        scheduler.deleteJob(JobKey.jobKey(name, group));
+
+        JobDataMap jobDataMap = new JobDataMap();
+        jobDataMap.put("task", task);
+        jobDataMap.put("taskPloy", taskPloy);
+
+        JobDetail jobDetail = JobBuilder.newJob(TaskJob.class)
+            	.withIdentity(name, group).storeDurably(false)
+                .requestRecovery().setJobData(jobDataMap).build();
+
+        Trigger trigger = TriggerBuilder.newTrigger().forJob(jobDetail)
+               .withIdentity(name, group)
+               .withSchedule(CronScheduleBuilder.cronSchedule(task.getConfig())).build();
+
+        // 再开启定时任务
+        scheduler.scheduleJob(jobDetail, trigger);
+        scheduler.start();
+    }
+
+    public void taskStop(Task task) throws SchedulerException {
+        String name = task.getName();
+        String group = task.getTaskGroup();
+        scheduler.unscheduleJob(TriggerKey.triggerKey(name, group));
+    }
+
+}
+```
+
+用到spring反射机制，实体类必须序列化。
 
