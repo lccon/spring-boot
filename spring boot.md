@@ -422,13 +422,19 @@ application.properties配置文件中设置：
 
 #### 2、HTML模板引擎存放路径
 
-  classpath：/templates，必须引入spring-boot-starter-thymeleaf的jar包，默认查找index.html
+classpath：/templates，必须引入spring-boot-starter-thymeleaf的jar包，默认查找index.html
 
 #### 3、使用jsp文件
 
-  创建存放jsp的路径WEB-INF/jsp,需要创建WEB-INF/web.xml,  
-  需要引入spring-boot-starter-tomcat和tomcat-jasper的jar包，  
-  application.properties需要配置前后缀：spring.mvc.view.prefix=/WEB-INF/jsp/和spring.mvc.view.suffix=.jsp
+创建存放jsp的路径WEB-INF/jsp,需要创建WEB-INF/web.xml, 
+
+![](C:\Users\n-335\AppData\Roaming\Typora\typora-user-images\1558150256474.png)
+需要引入spring-boot-starter-tomcat和tomcat-jasper的jar包，  
+application.properties需要配置前后缀：spring.mvc.view.prefix=/WEB-INF/jsp/和spring.mvc.view.suffix=.jsp  
+
+使用Apache的tomcat启动项目：
+
+![](C:\Users\n-335\AppData\Roaming\Typora\typora-user-images\1558150475732.png)
 
 #### 4、pom.xml依赖jar包
 	    <!-- 依赖父项目，版本控制 --> 
@@ -555,11 +561,11 @@ application.properties配置文件中设置：
 	        "http://mybatis.org/dtd/mybatis-3-config.dtd">
 	<configuration>
 	    <settings>
-			<!--设置驼峰-->
+			<!--设置驼峰命名格式，将表中user_name转化为类中的userName -->
 	        <setting name="mapUnderscoreToCamelCase" value="true"/>
 	    </settings>
 	</configuration>
-mybatis自定配置生效文件MyMybatisConfig.java  
+第二种方式mybatis自定配置MyMybatisConfig.java  
 
 	@Configuration
 	public class MyMybatisConfig {
