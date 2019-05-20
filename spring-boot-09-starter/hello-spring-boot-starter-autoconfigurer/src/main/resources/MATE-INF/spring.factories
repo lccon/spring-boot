@@ -1,0 +1,3 @@
+#启动HelloServiceAutoConfiguration文件，让其生效
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.lc.HelloServiceAutoConfiguration
