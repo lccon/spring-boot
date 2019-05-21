@@ -496,9 +496,9 @@ application.properties需要配置前后缀：spring.mvc.view.prefix=/WEB-INF/js
 	
 		<!-- 使用alibaba数据源druid -->
 		<dependency>
-			<groupId>com.alibaba</groupId>
-			<artifactId>druid-spring-boot-starter</artifactId>
-			<version>1.1.9</version>
+	        <groupId>com.alibaba</groupId>
+	        <artifactId>druid</artifactId>
+	        <version>1.1.9</version>
 		</dependency>
 	</dependencies>
 	
@@ -926,4 +926,23 @@ public class JobUtil {
 ```
 
 用到spring反射机制，实体类必须序列化。
+
+## 六、springboot使用缓存  
+
+#### 1、spring缓存抽象  
+
+①pom.xml导入依赖    
+
+```java
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-cache</artifactId>
+</dependency>
+```
+
+②在程序入口主函数中添加注解@EnableCaching，使用spring抽象缓存；
+
+③需要被缓存的方法上添加注解@Cacheable(cacheNames = "emp")；
+
+原理：先查询缓存是否有数据，有就直接返回，没有就查询数据库，返回的数据存入缓存，缓存的key为方法参数，没有参数spring自动生成，一个参数情况就为key，多个参数组合使用为key；
 
