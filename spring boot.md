@@ -931,7 +931,7 @@ public class JobUtil {
 
 #### 1、spring缓存抽象  
 
-①pom.xml导入依赖    
+**①**pom.xml导入依赖    
 
 ```java
 <dependency>
@@ -940,9 +940,19 @@ public class JobUtil {
 </dependency>
 ```
 
-②在程序入口主函数中添加注解@EnableCaching，使用spring抽象缓存；
+**②**在程序入口主函数中添加注解@EnableCaching，使用spring抽象缓存；
 
-③需要被缓存的方法上添加注解@Cacheable(cacheNames = "emp")；
+**③**需要被缓存的方法上添加注解@Cacheable(cacheNames = "emp")；
 
 原理：先查询缓存是否有数据，有就直接返回，没有就查询数据库，返回的数据存入缓存，缓存的key为方法参数，没有参数spring自动生成，一个参数情况就为key，多个参数组合使用为key；
+
+Cacheable其他属性：
+
+**key**：如key = "#root.methodName+'['+#id+']'"，自定义key，#root.methodName获取方法名，#id获取参数；
+
+**condition**：如condition = "#id > 1 and #root.getMethodName() eq 'getDepartmentById'"，自定义条件id>1并且方法名为getDepartmentById时进行缓存；
+
+**unless**：如unless = "#id == 2"，自定义id=2时不进行缓存；
+
+**④**修改方法上添加@CachePut(value = "emp", key = "#result.id") 修改方法并更新缓存，存入缓存时的key为对象id时，更新时，应该也要从对象中取出id去更新缓存；
 
