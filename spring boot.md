@@ -937,9 +937,23 @@ public class JobUtil {
 
 #### 2、使用docker
 
-①安装第三方库：yum install epel-release
+①安装第三方库：yum install https://get.docker.com/rpm/1.7.1/centos-6/RPMS/x86_64/docker-engine-1.7.1-1.el6.x86_64.rpm
 
-②安装docker-io：yum install https://get.docker.com/rpm/1.7.1/centos-6/RPMS/x86_64/docker-engine-1.7.1-1.el6.x86_64.rpm
+②安装docker-io：yum install docker-io；
+
+出现错误No package docker-io available，以下两种解决方法：
+
+```java
+yum install epel-release
+yum install docker-io
+```
+
+或
+
+```JAVA
+yum upgrade device-mapper-lib
+yum install docker-io
+```
 
 启动docker：service docker start
 
