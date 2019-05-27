@@ -927,7 +927,27 @@ public class JobUtil {
 
 用到spring反射机制，实体类必须序列化。
 
-## 六、springboot使用缓存  
+## 六、springboot与docker结合使用
+
+#### 1、环境描述
+
+①虚拟机网络适配器为桥接模式，IP和主机为同一网段，互相可以ping通，ping操作时主机需要关闭防火墙；
+
+②linux的镜像centOS必须是64位，查询内核版本(uname -r)且内核版本需要是2.6.32版本及以上；
+
+#### 2、使用docker
+
+①安装第三方库：yum install epel-release
+
+②安装docker-io：yum install https://get.docker.com/rpm/1.7.1/centos-6/RPMS/x86_64/docker-engine-1.7.1-1.el6.x86_64.rpm
+
+启动docker：service docker start
+
+测试：查看docker版本：docker -v，查看mysql镜像：docker search mysql；
+
+
+
+## 七、springboot使用缓存  
 
 #### 1、spring缓存抽象  
 
@@ -956,3 +976,4 @@ Cacheable其他属性：
 
 **④**修改方法上添加@CachePut(value = "emp", key = "#result.id") 修改方法并更新缓存，存入缓存时的key为对象id时，更新时，应该也要从对象中取出id去更新缓存；
 
+**⑤**删除方法上添加@CacheEvict(value = "emp", key = "#id")删除方法执行之后并删除以id值为key的缓存，可以使用allEntries = true代替key，删除所有的缓存；
