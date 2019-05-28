@@ -1002,3 +1002,4 @@ Cacheable其他属性：
 
 **⑤**删除方法上添加@CacheEvict(value = "emp", key = "#id")删除方法执行之后并删除以id值为key的缓存，可以使用allEntries = true代替key，删除所有的缓存；
 
+#### 2、使用redis缓存
