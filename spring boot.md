@@ -428,13 +428,13 @@ classpath：/templates，必须引入spring-boot-starter-thymeleaf的jar包，�
 
 创建存放jsp的路径WEB-INF/jsp,需要创建WEB-INF/web.xml, 
 
-![](C:\Users\n-335\AppData\Roaming\Typora\typora-user-images\1558150256474.png)
+![](assets/1558150256474.png)
 需要引入spring-boot-starter-tomcat和tomcat-jasper的jar包，  
 application.properties需要配置前后缀：spring.mvc.view.prefix=/WEB-INF/jsp/和spring.mvc.view.suffix=.jsp  
 
 使用Apache的tomcat启动项目：
 
-![](C:\Users\n-335\AppData\Roaming\Typora\typora-user-images\1558150475732.png)
+![](assets/1558150475732.png)
 
 #### 4、pom.xml依赖jar包
 	    <!-- 依赖父项目，版本控制 --> 
@@ -961,11 +961,11 @@ yum install docker-io
 
 ③镜像操作，拉取存放容器中
 
-![1558931471660](C:\Users\n-335\AppData\Roaming\Typora\typora-user-images\1558931471660.png)
+![](assets/1558931471660.png)
 
 ④启动容器
 
-​      	![image](C:\Users\n-335\AppData\Roaming\Typora\typora-user-images\1558932901450.png)
+​      	![image](assets/1558932901450.png)
 
 ⑤启动mysql数据库，生成编码格式
 
