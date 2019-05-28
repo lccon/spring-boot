@@ -959,7 +959,17 @@ yum install docker-io
 
 测试：查看docker版本：docker -v，查看mysql镜像：docker search mysql；
 
+③镜像操作，拉取存放容器中
 
+![1558931471660](C:\Users\n-335\AppData\Roaming\Typora\typora-user-images\1558931471660.png)
+
+④启动容器
+
+​      	![image](C:\Users\n-335\AppData\Roaming\Typora\typora-user-images\1558932901450.png)
+
+⑤启动mysql数据库，生成编码格式
+
+docker run -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root --name mysql -d mysql:5.6.42 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
 
 ## 七、springboot使用缓存  
 
