@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lc.mapper.DepartmentMapper">
+    <resultMap id="departmentResultMap" type="com.lc.domain.Department">
+        <result property="id" column="id"/>
+        <result property="departName" column="depart_name"/>
+    </resultMap>
+
+    <sql id="columns">
+        id, depart_name
+    </sql>
+
+    <select id="getDepartmentById" parameterType="java.lang.Long" resultMap="departmentResultMap">
+        SELECT
+        <include refid="columns"/>
+        FROM department
+        WHERE id = #{id}
+    </select>
+
+    <select id="findDepartmentForList" resultMap="departmentResultMap">
+        SELECT
+        <include refid="columns"/>
+        FROM department
+    </select>
+
+    <update id="updateDepartmentById" parameterType="com.lc.domain.Department">
+        update department
+        <set>
+            <if test="departName != null and departName != ''">
+                depart_name = #{departName}
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteDeparmentById" parameterType="java.lang.Long">
+        DELETE FROM department
+        WHERE id = #{id}
+    </delete>
+</mapper>

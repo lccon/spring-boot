@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lc.mapper.EmployerMapper">
+
+    <resultMap id="empResultMap" type="com.lc.domain.Emp">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="email" column="email"/>
+        <result property="gender" column="gender"/>
+        <result property="department.id" column="depart_id"/>
+        <result property="birth" column="birth"/>
+    </resultMap>
+
+    <sql id="columns">
+        id, name, email, gender, depart_id, birth
+    </sql>
+
+    <select id="findEmployerForList" resultMap="empResultMap">
+        SELECT
+        <include refid="columns"/>
+        FROM emp
+    </select>
+
+    <insert id="addEmp" parameterType="com.lc.domain.Emp">
+        <selectKey keyProperty="id" resultType="java.lang.Long" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO emp(id, name, email, gender, depart_id, birth)
+        VALUES (#{id}, #{name}, #{email}, #{gender}, #{department.id}, #{birth})
+    </insert>
+
+</mapper>
