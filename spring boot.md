@@ -1003,3 +1003,63 @@ Cacheable其他属性：
 **⑤**删除方法上添加@CacheEvict(value = "emp", key = "#id")删除方法执行之后并删除以id值为key的缓存，可以使用allEntries = true代替key，删除所有的缓存；
 
 #### 2、使用redis缓存
+
+①pom.xml导入依赖
+
+```java
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-data-redis</artifactId>
+</dependency>
+```
+
+②redis配置参数
+
+```java
+spring.redis.database=1  //自定义库，默认db0
+spring.redis.host=192.168.10.203  //连接redis库
+spring.redis.port=6379  //端口号
+```
+
+③自定义的json对象
+
+```java
+@Configuration
+public class MyRedisConfig {
+    @Bean
+    public RedisTemplate<Object, Department> serRedisTemplate(
+            RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<Object, Department> template = new RedisTemplate<>();
+        template.setConnectionFactory(redisConnectionFactory);
+        Jackson2JsonRedisSerializer<Department> ser = new  Jackson2JsonRedisSerializer<Department>(Department.class);
+        template.setDefaultSerializer(ser);
+        return template;
+    }
+}
+```
+
+④实现缓存
+
+```java
+@Autowired
+private RedisTemplate<Object, Department> serRedisTemplate;
+
+@Override
+public Department getDepartmentById(Long id) {
+    if(id == null) {
+        throw new RuntimeException("参数错误");
+    }
+    try {
+        Department department = serRedisTemplate.opsForValue().get(id);
+        if(department == null) {
+            System.out.println(id + "号部门");
+            department = departmentMapper.getDepartmentById(id);
+        	serRedisTemplate.opsForValue().set(id, department);
+   		}
+        return department;
+    } catch (Exception e) {
+        throw new RuntimeException("查询部门出错", e);
+    }
+}
+```
+
