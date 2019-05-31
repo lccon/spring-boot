@@ -1004,6 +1004,24 @@ Cacheable其他属性：
 
 #### 2、使用redis缓存
 
+1、Redis的常用五大数据类型
+
+String【字符串】、List【列表】、Set【集合】、Hash【散列】、ZSet【有序集合】
+
+分为两种一种是**StringRedisTemplate**，另一种是**RedisTemplate**
+
+根据不同的数据类型，大致的操作也分为这5种，以StringRedisTemplate为例
+
+```
+stringRedisTemplate.opsForValue()  --String
+stringRedisTemplate.opsForList()  --List
+stringRedisTemplate.opsForSet()  --Set
+stringRedisTemplate.opsForHash()  --Hash
+stringRedisTemplate.opsForZset()  -Zset
+```
+
+2、redis操作
+
 ①pom.xml导入依赖
 
 ```java
@@ -1067,6 +1085,71 @@ public Department getDepartmentById(Long id) {
 
 ##### 1、rabbitMQ
 
-①原理：发布者将消息发送给消息服务器，消息服务器接收到消息，根据规则发送给其内部的交换机，交换机接收到消息根据规则分发给队列，接受者通过TCP和消息服务器建立连接，将消息传入管道，获取队列消息。
+原理：发布者将消息发送给消息服务器，消息服务器接收到消息，根据规则发送给其内部的交换机，交换机接收到消息根据规则分发给队列，接受者通过TCP和消息服务器建立连接，将消息传入管道，获取队列消息。
 
 ![1559133470107](assets/1559133470107.png)
+
+####  2、RabbitMQ的运行机制
+
+Exchange的三种方式 
+
+direct：根据路由键直接匹配，一对一；
+
+fanout:不经过路由键，直接发送到每一个队列；
+
+topic:类似模糊匹配的根据路由键，来分配绑定的队列；
+
+## 九、springboot使用异步，多线程处理
+
+#### 1、主函数入口处标注注解@EnableSync能够使用异步
+
+```java
+@SpringBootApplication
+@EnableAsync   //可以使用异步
+public class SpringBoot11AsyncApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(SpringBoot11AsyncApplication.class, args);
+	}
+
+}
+```
+
+####  2、标注异步方法，开启多线程处理
+
+```java
+@Service
+public class AsyncServiceImpl implements AsyncService{
+
+    @Async  //标注为是一个异步方法，spring单独开始一个线程进行处理
+    @Override
+    public void getConentInfo() {
+        try {
+            Thread.sleep(6000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("异步处理");
+    }
+}
+```
+
+#### 3、controller调用测试
+
+```java
+@Controller
+@RequestMapping("/api")
+public class AsyncController {
+
+    @Autowired
+    private AsyncService asyncService;
+
+    @RequestMapping("/hello")
+    @ResponseBody
+    public String hello() {
+        asyncService.getConentInfo();
+        return "HelloWorld";
+    }
+}
+```
+
