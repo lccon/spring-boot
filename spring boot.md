@@ -1153,3 +1153,215 @@ public class AsyncController {
 }
 ```
 
+## 十、springboot简单定时器实现
+
+#### 1、主函数定义@EnableScheduling，使用定时任务 
+
+```java
+@SpringBootApplication
+@EnableScheduling  //可以使用定时任务
+public class SpringBoot12ScheduledApplication {
+	public static void main(String[] args) {
+		SpringApplication.run(SpringBoot12ScheduledApplication.class, args);
+	}
+}
+```
+
+#### 2、定义时间执行任务
+
+```java
+@Component  //spring管理
+public class ScheduledController {
+
+    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+
+    // 每三秒执行一次
+    @Scheduled(fixedDelay = 3000)
+    public void test() {
+        System.out.println(sdf.format(new Date()));
+    }
+
+    //第一次延迟1秒执行，当执行完后3秒再执行
+    @Scheduled(initialDelay = 2000, fixedDelay = 3000)
+    public void timerInit() {
+        System.out.println("init : " + sdf.format(new Date()));
+    }
+
+    // 每天的11:10执行
+    //@Scheduled(cron = "00 38 19 * * ?")
+    //@Scheduled(cron = "0 * * * * *") //每分钟执行一次
+    @Scheduled(cron = "0/5 * * 3 * ?") //每个月的第三天每五秒执行一次，星期与天冲突用？代替
+    public void test2() {
+        System.out.println("current time" + sdf.format(new Date()));
+    }
+}
+```
+
+![1559305823899](assets/1559305823899.png)
+
+## 十一、springboot发送邮件
+
+#### 1、创建application-qq.properties，定义发送邮件规则
+
+```java
+spring.mail.host=smtp.qq.com
+spring.mail.username=488789589@qq.com
+spring.mail.password=rxelfurlazxhbjgh
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+spring.mail.properties.mail.smtp.starttls.required=true
+```
+
+#### 2、发送邮件测试
+
+```java
+@RunWith(SpringRunner.class)
+@SpringBootTest
+@ActiveProfiles("qq")
+public class SpringBoot13MailApplicationTests {
+
+	@Autowired
+	private JavaMailSender javaMailSender;
+
+	@Value("${spring.mail.username}")
+	private String userName;
+
+	@Test
+	public void testSendSimple() {
+		SimpleMailMessage message = new SimpleMailMessage();
+		message.setFrom(userName);
+		message.setTo("1193429990@qq.com");
+		message.setSubject("标题");
+		message.setText("内容");
+		javaMailSender.send(message);
+	}
+
+	@Test
+	public void testSendByName() {
+		MimeMessage mineMessage = null;
+		try {
+			mineMessage = javaMailSender.createMimeMessage();
+			MimeMessageHelper helper = new MimeMessageHelper(mineMessage, true);
+			helper.setFrom(new InternetAddress(userName, "阿聪", "UTF-8"));
+			helper.setTo("1193429990@qq.com");
+			helper.setSubject("标题：生态");
+			StringBuilder sb = new StringBuilder();
+			sb.append("<h1>内容1</h1>").append("<h2>内容2</h2>").append("<h3>内容3</h3>")
+					.append("<h4>内容4</h4>").append("<h5>内容5</h5>").append("<h6>内容       					6</h6>");
+			helper.setText(sb.toString(), true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		javaMailSender.send(mineMessage);
+	}
+
+}
+
+```
+
+## 十二、springboot利用dubbo解决分布式调用
+
+#### 1、linux虚拟机docker启动zookeeper
+
+```` java
+docker run --name myzookeeper -p 2181:2181 --restart always zookeeper:latest
+````
+
+
+
+#### 2、dubbo结构图
+
+![1559361306883](assets/1559361306883.png)
+
+〇.Container容器对Provider提供接口做支撑；
+
+①.register将接口注册到注册中心；
+
+②.subscribe调用者从注册中心zookeeper获取地址；
+
+③.notify如果提供者接口改变，注册中心作为一个长连接更改调用者的接口信息；
+
+④.invoke调用者获取到地址利用dubbo调用提供者接口；
+
+⑤.Monitor作为监控，监控调用的次数等信息；
+
+#### 3、案例实现dubbo购票
+
+①提供者和调用者导入同一依赖
+
+```java
+// 需要使用springboot1.5.10版本
+<parent>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-parent</artifactId>
+	<version>1.5.10.RELEASE</version>
+	<relativePath/> 
+</parent>
+
+//dubbo服务
+<dependency>
+    <groupId>com.alibaba.boot</groupId>
+    <artifactId>dubbo-spring-boot-starter</artifactId>
+	<version>0.1.0</version>
+</dependency>
+
+//注册zookeeper客户端
+<dependency>
+    <groupId>com.github.sgroschupf</groupId>
+    <artifactId>zkclient</artifactId>
+    <version>0.1</version>
+</dependency>
+```
+
+②提供者application.properties配置
+
+```java
+#应用名称
+dubbo.application.name=provider_ticker
+#注册中心地址
+dubbo.registry.address=zookeeper://192.168.10.203:2181
+#将ticket.service包下文件发送到zk中
+dubbo.scan.base-packages=com.lc.ticket.service
+```
+
+③实现提供购票服务
+
+```java
+@Component  //spring管理
+@Service    //dubbo包下的注解
+public class TickerServiceImpl implements TickerService {
+
+    @Override
+    public String getTickerInfo() {
+        return "<<何以为家>>";
+    }
+}
+```
+
+④调用者application.properties配置
+
+```java
+dubbo.application.name=customer_ticker
+
+dubbo.registry.address=zookeeper://192.168.10.203:2181
+```
+
+⑤需要将提供者的ticket.service包下接口存入调用者文件中，需要目录相同
+
+⑥调用者通过dubbo实现购票
+
+```java
+@Service //springframework包下注解
+public class UserServiceImpl implements UserService {
+
+    @Reference  //注解是通过TickerService实现dubbo远程调用
+    TickerService tickerService;
+
+    public String getTickerInfo() {
+        String tickerInfo = tickerService.getTickerInfo();
+        return "买到票了：" + tickerInfo;
+    }
+
+}
+```
+
