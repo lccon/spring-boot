@@ -1620,3 +1620,19 @@ public class UserController {
 ①application.properties配置spring.application.name时不能使用下划线；
 
 ②各模块启动顺序，注册中心—提供者—消费者；
+
+## 十四、springboot实现热部署
+
+#### 1、pom.xml添加依赖
+
+```java
+<dependency>
+   <groupId>org.springframework.boot</groupId>
+   <artifactId>spring-boot-devtools</artifactId>
+   <scope>runtime</scope>
+   <optional>true</optional>
+</dependency>
+```
+
+#### 2、ctrl+F9重新build project，实现热部署
+
