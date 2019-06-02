@@ -1267,8 +1267,6 @@ public class SpringBoot13MailApplicationTests {
 docker run --name myzookeeper -p 2181:2181 --restart always zookeeper:latest
 ````
 
-
-
 #### 2、dubbo结构图
 
 ![1559361306883](assets/1559361306883.png)
@@ -1365,3 +1363,260 @@ public class UserServiceImpl implements UserService {
 }
 ```
 
+#### 4、注意
+
+①提供方的实现层@service注解要用dubbo包下；
+
+②springboot的版本依赖1.5.10.RELEASE;
+
+## 十三、springboot利用springcloud解决分布式调用
+
+#### 1、注册中心模块
+
+①pom.xml导入依赖，Eureka Server
+
+```java
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.1.5.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+
+	<properties>
+		<java.version>1.8</java.version>
+		<spring-cloud.version>Greenwich.SR1</spring-cloud.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+```
+
+②application.properties加入配置
+
+```java
+server.port=8761
+#eureka实例的主机名
+eureka.instance.hostname=eureka-server
+#不将自己注册到注册中心
+eureka.client.register-with-eureka=false
+#不从eureka上来获取服务的注册信息
+eureka.client.fetch-registry=false
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
+```
+
+③主入口添加主机@EnableEurekaServer，标注为注册中心
+
+④开启应用，访问注册中心http://localhost:8761
+
+#### 2、提供者模块
+
+①pom.xml导入依赖，Eureka Discovery
+
+```java
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.1.5.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+
+	<properties>
+		<java.version>1.8</java.version>
+		<spring-cloud.version>Greenwich.SR1</spring-cloud.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+```
+
+②application.properties加入配置
+
+```java
+server.port=8530
+spring.application.name=provider-ticket
+# 注册服务的时候使用服务的IP地址
+eureka.instance.prefer-ip-address=true
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
+```
+
+③添加service层服务及controller层调用
+
+#### 3、消费者模块
+
+①pom.xml添加依赖，Eureka Discovery
+
+```
+<parent>
+   <groupId>org.springframework.boot</groupId>
+   <artifactId>spring-boot-starter-parent</artifactId>
+   <version>2.1.5.RELEASE</version>
+   <relativePath/> <!-- lookup parent from repository -->
+</parent>
+
+<properties>
+   <java.version>1.8</java.version>
+   <spring-cloud.version>Greenwich.SR1</spring-cloud.version>
+</properties>
+
+<dependencies>
+   <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+   </dependency>
+
+   <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+   </dependency>
+
+   <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+   </dependency>
+</dependencies>
+
+<dependencyManagement>
+   <dependencies>
+      <dependency>
+         <groupId>org.springframework.cloud</groupId>
+         <artifactId>spring-cloud-dependencies</artifactId>
+         <version>${spring-cloud.version}</version>
+         <type>pom</type>
+         <scope>import</scope>
+      </dependency>
+   </dependencies>
+</dependencyManagement>
+
+<build>
+   <plugins>
+      <plugin>
+         <groupId>org.springframework.boot</groupId>
+         <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+   </plugins>
+</build>
+```
+
+②application.properties添加配置
+
+```
+server.port=8555
+spring.application.name=costumer-user
+# 注册服务的时候使用服务的IP地址
+eureka.instance.prefer-ip-address=true
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
+```
+
+③主入口添加注解@EnableDiscoveryClient发现服务，配置调用类
+
+```
+@EnableDiscoveryClient
+@SpringBootApplication
+public class CostumerUserApplication {
+
+   public static void main(String[] args) {
+      SpringApplication.run(CostumerUserApplication.class, args);
+   }
+
+   @LoadBalanced //使用负载均衡机制
+   @Bean
+   public RestTemplate restTemplate() {
+      return new RestTemplate();
+   }
+
+}
+```
+
+④实现分布式调用
+
+```
+@Controller
+public class UserController {
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @RequestMapping("/buy")
+    @ResponseBody
+    public String getTicketInfo(String name) {
+        String tictket = restTemplate.getForObject("http://PROVIDER-TICKET/ticket", 								String.class);
+        return name + "买到了："+tictket;
+    }
+
+}
+```
+
+#### 4、注意
+
+①application.properties配置spring.application.name时不能使用下划线；
+
+②各模块启动顺序，注册中心—提供者—消费者；
