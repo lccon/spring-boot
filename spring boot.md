@@ -1636,3 +1636,165 @@ public class UserController {
 
 #### 2、ctrl+F9重新build project，实现热部署
 
+## 十五、 springboot使用elasticsearch
+
+#### 1、docker安装ElasticSearch镜像
+
+```java
+# 控制es使用内存
+docker run -e ES_JAVA_OPTS="-Xms256m -Xmx256m" -d -p 9201:9200 -p 9301:9300 --name myEs elasticsearch:2.4.6
+```
+
+#### 2、描述
+
+es是以文档的形式存储数据，文档中存储的是轻量级json数据，详见es文档 ：[es文档说明](<https://www.elastic.co/guide/cn/elasticsearch/guide/current/_phrase_search.html>)，实现与es交互有两种方式jest和SpringData ElasticSearch;
+
+#### 3、jest实现方式
+
+①pom.xml导入依赖
+
+```java
+<!-- 版本要和es版本一直，这里都是5版本-->
+<dependency>
+   <groupId>io.searchbox</groupId>
+   <artifactId>jest</artifactId>
+   <version>5.3.3</version>
+</dependency>
+```
+
+②application.properties添加配置
+
+```java
+spring.elasticsearch.jest.uris=http://192.168.10.32:9201
+```
+
+③java实现
+
+```java
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class SpringBoot08ElasticsearchApplicationTests {
+
+   @Autowired
+   private JestClient jestClient;
+
+   @Test
+   public void addJestEs() {
+      // 保存es文档
+      Article article = new Article();
+      article.setId(1L);
+      article.setAuthor("张三");
+      article.setTitle("day day up");
+      article.setContent("努力向前");
+
+      // 构建一个索引功能
+      Index build = new 							     Index.Builder(article).index("lc").type("news").id(String.valueOf(article.getId())).build();
+
+      try {
+         jestClient.execute(build);
+      } catch (IOException e) {
+         e.printStackTrace();
+      }
+   }
+
+    
+   @Test
+   public void jestSearch() {
+      //查询表达式
+      String content = "{\n" +
+                     "\t\"query\" : {\n" +
+                     "\t\t\"match\" : {\n" +
+                     "\t\t\t\"content\" : \"努力\"\n" +
+                     "\t\t}\n" +
+                     "\t}\n" +
+                     "}";
+      //构建搜索功能
+      Search build = new Search.Builder(content).addIndex("lc").addType("news").build();
+      try {
+         SearchResult execute = jestClient.execute(build);
+         System.out.println(execute.getJsonString());
+      } catch (IOException e) {
+         e.printStackTrace();
+      }
+   }
+
+}
+```
+
+#### 4、springdata elasticsearch实现方式
+
+①pom.xml导入依赖
+
+```java
+<dependency>
+   <groupId>org.springframework.boot</groupId>
+   <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+</dependency>
+```
+
+②application.properties添加配置
+
+```java
+#cluster-name和访问9201中的cluster-name保持一致
+spring.data.elasticsearch.cluster-name=elasticsearch
+spring.data.elasticsearch.cluster-nodes=192.168.10.32:9301
+```
+
+③对象类要设置索引及类型
+
+```
+@Document(indexName = "lc", type = "book")
+public class Book {
+}
+```
+
+④定义接口实现ElasticsearchRepository类
+
+```
+public interface BookRepository extends ElasticsearchRepository<Book, Long>{
+    List<Book> getBookByBookName(String bookName);
+}
+```
+
+实现接口，方法名称定为by+对象属性，不用实现
+
+⑤测试方法
+
+```
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class SpringBoot08SpringdataElasticsearchApplicationTests {
+
+   @Autowired
+   private BookRepository bookRepository;
+
+   @Test
+   public void addEsData() {
+      Book book = new Book();
+      book.setId(4L);
+      book.setBookName("java基础");
+      book.setAuthor("lc");
+      bookRepository.index(book);
+   }
+
+   @Test
+   public void searchContent() {
+      List<Book> bookList = bookRepository.getBookByBookName("java");
+      for (Book book : bookList) {
+         System.out.println(book);
+      }
+
+   }
+}
+```
+
+#### 注意
+
+使用springdata elasticsearch方式，es版本和docker下载镜像es版本可能不一致，导致9300端口号访问失败org.elasticsearch.transport.ConnectTransportException: [][192.168.10.229:9300] connect_timeout[30s]，版本适配说明参照[es适配说明](<https://github.com/spring-projects/spring-data-elasticsearch>)
+
+![1561123187301](D:/SpringBoot/assets/1561123187301.png)
+
+解决办法：  
+
+①使用springboot高版本，依赖的elasticsearch版本与docker镜像elasticsearch版本保持一致；
+②下载低版本镜像(elasticsearch:2.4.6)与项目中es版本保持一致，项目就能正常运行；
