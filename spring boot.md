@@ -1792,7 +1792,7 @@ public class SpringBoot08SpringdataElasticsearchApplicationTests {
 
 使用springdata elasticsearch方式，es版本和docker下载镜像es版本可能不一致，导致9300端口号访问失败org.elasticsearch.transport.ConnectTransportException: [][192.168.10.229:9300] connect_timeout[30s]，版本适配说明参照[es适配说明](<https://github.com/spring-projects/spring-data-elasticsearch>)
 
-![1561123187301](D:/SpringBoot/assets/1561123187301.png)
+![1561123187301](assets/1561123187301.png)
 
 解决办法：  
 
